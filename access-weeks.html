@@ -28,7 +28,7 @@
             padding: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             text-align: center;
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
             backdrop-filter: blur(10px);
         }
@@ -78,6 +78,33 @@
             transform: translateY(-2px);
         }
 
+        .sub-links {
+            list-style: none;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sub-links a {
+            display: block;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
+        }
+
+        .sub-links a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.4);
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 30px 20px;
@@ -98,7 +125,13 @@
     <div class="container">
         <h1>Access Week Files</h1>
         <ul class="week-links">
-            <li><a href="Week-01.html">📚 Week 01</a></li>
+            <li>
+                <a href="Week-01.html">📚 Week 01</a>
+                <ul class="sub-links">
+                    <li><a href="p0.html">📄 Project 0</a></li>
+                    <li><a href="p1.html">📄 Project 1</a></li>
+                </ul>
+            </li>
             <li><a href="Week-02.html">📚 Week 02</a></li>
         </ul>
     </div>
