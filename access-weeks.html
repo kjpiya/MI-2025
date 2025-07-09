@@ -5,12 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Access Weeks</title>
     <link rel="stylesheet" href="all.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .week-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .week-links li {
+            margin: 0;
+        }
+
+        .week-links a {
+            display: block;
+            padding: 20px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .week-links a:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+
+        .week-links a:active {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .week-links a {
+                padding: 15px 20px;
+                font-size: 1.1em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Access Week Files</h1>
-    <ul>
-        <li><a href="Week-01.html">Week 01</a></li>
-        <li><a href="Week-02.html">Week 02</a></li>
-    </ul>
+    <div class="container">
+        <h1>Access Week Files</h1>
+        <ul class="week-links">
+            <li><a href="Week-01.html">📚 Week 01</a></li>
+            <li><a href="Week-02.html">📚 Week 02</a></li>
+        </ul>
+    </div>
 </body>
 </html> 
