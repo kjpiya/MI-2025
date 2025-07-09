@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Systems and Architecture Lecture</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            background-color: #0D1117; /* Consistent dark background for the entire page */
+            color: #E2E8F0; /* Default light text color */
+        }
+
+        /* Base style for each slide container */
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            scroll-snap-align: start;
+            background-color: #0D1117; /* Ensure consistent dark background */
+        }
+
+        /* Global Circuit Board Background Effect */
+        .circuit-lines-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1; /* Below content */
+            opacity: 0.7;
+            background-image:
+                linear-gradient(0deg, transparent 98%, rgba(59, 130, 246, 0.05) 98%), /* Subtle horizontal lines */
+                linear-gradient(90deg, transparent 98%, rgba(59, 130, 246, 0.05) 98%); /* Subtle vertical lines */
+            background-size: 40px 40px;
+        }
+
+        .line-segment {
+            position: absolute;
+            background-color: #3B82F6; /* Bright blue for prominent lines */
+            box-shadow: 0 0 10px #3B82F6, 0 0 20px #3B82F6, 0 0 30px #3B82F6; /* Glowing effect */
+            filter: blur(0.5px); /* Subtle blur for glow */
+        }
+
+        .content-area {
+            position: relative;
+            z-index: 10; /* Above background patterns */
+            text-align: center;
+            padding: 2rem;
+            max-width: 90%; /* General max width for content */
+            width: 100%;
+        }
+
+        .main-title {
+            font-weight: 800;
+            color: #93C5FD; /* Lighter blue for main titles */
+            text-shadow: 0 0 15px rgba(147, 197, 253, 0.7), 0 0 30px rgba(147, 197, 253, 0.5); /* Glowing text */
+            letter-spacing: 0.05em;
+            margin-bottom: 2rem;
+        }
+
+        /* --- Slide 1: Title Slide Specifics --- */
+        #title-slide-systems-arch .main-title { font-size: 5rem; margin-bottom: 2rem; }
+        #title-slide-systems-arch .icon-wrapper { margin-top: 1.5rem; }
+        #title-slide-systems-arch .icon-wrapper svg {
+            width: 100px; height: 100px; fill: #3B82F6; filter: drop-shadow(0 0 8px #3B82F6);
+        }
+        /* Lines for title slide - more prominent */
+        #title-slide-systems-arch .line-segment { z-index: 2; opacity: 1; }
+        .line-h-1 { top: 15%; left: 0%; width: 50%; height: 2px; }
+        .line-h-2 { top: 30%; right: 0%; width: 40%; height: 2px; }
+        .line-h-3 { top: 60%; left: 10%; width: 35%; height: 2px; }
+        .line-h-4 { top: 85%; right: 5%; width: 60%; height: 2px; }
+        .line-v-1 { left: 20%; top: 0%; height: 40%; width: 2px; }
+        .line-v-2 { left: 70%; bottom: 0%; height: 50%; width: 2px; }
+        .line-v-3 { left: 45%; top: 40%; height: 30%; width: 2px; }
+        .line-d-1 { width: 2px; height: 150px; transform: rotate(45deg); transform-origin: top left; top: 10%; left: 40%; }
+        .line-d-2 { width: 2px; height: 180px; transform: rotate(-30deg); transform-origin: top right; top: 50%; right: 15%; }
+
+        /* --- Slide 2: Introduction Slide Specifics --- */
+        #lecture-slide .title { font-size: 3.5rem; font-weight: 700; margin-bottom: 2rem; text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); }
+        #lecture-slide .icon-container { display: flex; justify-content: center; gap: 3rem; margin-top: 3rem; flex-wrap: wrap; }
+        #lecture-slide .icon-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: #63B3ED; /* Blue for text */
+            font-size: 1.25rem; font-weight: 600;
+        }
+        #lecture-slide .icon-item i {
+            font-size: 4rem; margin-bottom: 0.75rem; padding: 1.5rem;
+            background-color: rgba(59, 130, 246, 0.1); /* Semi-transparent blue background */
+            border-radius: 50%; border: 1px solid #3B82F6; /* Blue border */
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); /* Blue glow */
+            transition: transform 0.3s ease-in-out;
+            color: #93C5FD; /* Lighter blue for icons */
+        }
+        #lecture-slide .icon-item:hover i { transform: scale(1.1); }
+
+        /* --- Slide 3: Internal CPU Components Specifics --- */
+        #cpu-internal-components .main-title { font-size: 3.8rem; margin-bottom: 2.5rem; }
+        #cpu-internal-components .cpu-layout {
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start;
+            gap: 3rem; max-width: 1400px; margin: 0 auto;
+        }
+        #cpu-internal-components .diagram-section {
+            flex: 1 1 550px; min-width: 300px;
+            background-color: rgba(30, 41, 59, 0.7);
+            border-radius: 1rem; padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 2px solid #60A5FA; /* Blue border */
+        }
+        #cpu-internal-components .description-section {
+            flex: 1 1 550px; min-width: 300px;
+            display: flex; flex-direction: column; gap: 1.5rem;
+        }
+        #cpu-internal-components .cpu-svg {
+            width: 100%; height: 400px;
+            background-color: #0F172A; border-radius: 0.75rem;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5); padding: 10px;
+        }
+        #cpu-internal-components .cpu-box { fill: #1E293B; stroke: #60A5FA; stroke-width: 3; rx: 12; ry: 12; }
+        #cpu-internal-components .component-alu,
+        #cpu-internal-components .component-cu,
+        #cpu-internal-components .component-registers { fill: #2D3748; /* Darker internal fill */ }
+        #cpu-internal-components .component-stroke { stroke: #60A5FA; stroke-width: 2; rx: 8; ry: 8; }
+        #cpu-internal-components .component-text { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 700; fill: #FFFFFF; text-anchor: middle; dominant-baseline: middle; }
+        #cpu-internal-components .flow-arrow { stroke: #93C5FD; stroke-width: 3; marker-end: url(#arrowhead); box-shadow: 0 0 8px #93C5FD; }
+        #cpu-internal-components .flow-arrow-dashed {
+            stroke: #60A5FA; stroke-width: 3; marker-end: url(#arrowhead);
+            stroke-dasharray: 6 6; box-shadow: 0 0 8px #60A5FA;
+        }
+        #cpu-internal-components #arrowhead { fill: #93C5FD; } /* Arrowhead for solid lines */
+        #cpu-internal-components #arrowheadDashed { fill: #60A5FA; } /* Arrowhead for dashed lines */
+
+        #cpu-internal-components .component-description-card {
+            background-color: rgba(30, 41, 59, 0.7);
+            border-radius: 0.75rem; padding: 1.25rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); text-align: left;
+            border-left: 6px solid #60A5FA; /* Consistent blue border */
+        }
+        #cpu-internal-components .description-title { font-size: 1.7rem; font-weight: 700; margin-bottom: 0.75rem; color: #BFDBFE; }
+        #cpu-internal-components .description-list { list-style-type: disc; padding-left: 1.5rem; font-size: 1.05rem; line-height: 1.7; color: #CBD5E0; }
+        #cpu-internal-components .description-list li::marker { color: #93C5FD; /* Lighter blue bullets */ }
+
+        /* --- Slide 4: Architecture Comparison Specifics --- */
+        #architecture-comparison-slide .main-title { font-size: 3rem; margin-bottom: 2rem; }
+        #architecture-comparison-slide .architecture-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+            width: 100%; justify-items: center;
+        }
+        #architecture-comparison-slide .architecture-card {
+            background-color: rgba(30, 41, 59, 0.7); /* Darker background */
+            border-radius: 0.75rem; padding: 1.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            display: flex; flex-direction: column; align-items: center;
+            width: 90%; max-width: 500px;
+            border: 2px solid #60A5FA; /* Blue border */
+        }
+        #architecture-comparison-slide .architecture-name {
+            font-size: 1.75rem; font-weight: 600; margin-bottom: 1.5rem;
+            color: #BFDBFE; /* Lighter blue for sub-titles */
+        }
+        #architecture-comparison-slide .diagram-svg {
+            width: 100%; height: 250px;
+            background-color: #0F172A; border-radius: 0.5rem;
+            margin-top: 1rem; box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+        }
+        #architecture-comparison-slide .component-box { fill: #1E293B; stroke: #60A5FA; stroke-width: 2; rx: 8; ry: 8; }
+        #architecture-comparison-slide .component-text { font-family: 'Inter', sans-serif; font-size: 16px; fill: #E2E8F0; text-anchor: middle; dominant-baseline: middle; }
+        /* Data and Instruction buses in shades of blue with glow */
+        #architecture-comparison-slide .bus-line-data { stroke: #93C5FD; stroke-width: 4; marker-end: url(#arrowheadDataComp); box-shadow: 0 0 10px #93C5FD; }
+        #architecture-comparison-slide .bus-line-instruction { stroke: #3B82F6; stroke-width: 4; marker-end: url(#arrowheadInstructionComp); box-shadow: 0 0 10px #3B82F6; }
+        #architecture-comparison-slide .bus-label { font-family: 'Inter', sans-serif; font-size: 14px; fill: #CBD5E0; }
+        #architecture-comparison-slide #arrowheadDataComp { fill: #93C5FD; }
+        #architecture-comparison-slide #arrowheadInstructionComp { fill: #3B82F6; }
+
+        /* --- Slide 5: Infographic Specifics --- */
+        #infographic-system-types .main-title { font-size: 3.5rem; margin-bottom: 2.5rem; }
+        #infographic-system-types .info-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem; width: 100%; justify-items: center; max-width: 1200px; margin: 0 auto;
+        }
+        #infographic-system-types .info-card {
+            background-color: rgba(30, 41, 59, 0.7); /* Dark semi-transparent card */
+            border-radius: 1.5rem; padding: 2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            display: flex; flex-direction: column; align-items: center;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border-bottom: 8px solid #3B82F6; /* Blue bottom border */
+        }
+        #infographic-system-types .info-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5); }
+        /* Removed distinct colors for microprocessor, microcontroller, embedded-system, all now use the blue theme */
+        #infographic-system-types .icon-wrapper {
+            background-color: rgba(59, 130, 246, 0.15); /* Light blue background for icons */
+            border-radius: 50%; padding: 1.5rem; margin-bottom: 1.5rem;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); /* Blue glow */
+            border: 1px solid #3B82F6;
+        }
+        #infographic-system-types .icon-wrapper svg {
+            width: 80px; height: 80px;
+            fill: #93C5FD; /* Lighter blue for icons */
+            filter: drop-shadow(0 0 5px #93C5FD);
+        }
+        #infographic-system-types .info-card-title { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: #BFDBFE; }
+        #infographic-system-types .info-description { font-size: 1.15rem; font-weight: 400; line-height: 1.6; color: #CBD5E0; }
+
+
+        /* --- Responsive Adjustments (Combined and Unified) --- */
+        @media (max-width: 1200px) {
+            #cpu-internal-components .main-title { font-size: 3rem; margin-bottom: 2rem; }
+            #cpu-internal-components .cpu-layout { gap: 2rem; }
+            #cpu-internal-components .diagram-section, #cpu-internal-components .description-section { flex: 1 1 450px; }
+            #cpu-internal-components .cpu-svg { height: 350px; }
+            #cpu-internal-components .component-text { font-size: 16px; }
+            #cpu-internal-components .description-title { font-size: 1.5rem; }
+            #cpu-internal-components .description-list { font-size: 1rem; }
+        }
+
+        @media (max-width: 1024px) {
+            .main-title { font-size: 3rem; margin-bottom: 2rem; }
+            #architecture-comparison-slide .main-title, #infographic-system-types .main-title { font-size: 2.5rem; margin-bottom: 2rem; }
+
+            #architecture-comparison-slide .architecture-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            #architecture-comparison-slide .architecture-name { font-size: 1.5rem; }
+            #architecture-comparison-slide .diagram-svg { height: 220px; }
+            #architecture-comparison-slide .component-text { font-size: 14px; }
+            #architecture-comparison-slide .bus-label { font-size: 12px; }
+
+            #infographic-system-types .info-grid { gap: 2rem; }
+            #infographic-system-types .info-card { padding: 1.5rem; border-radius: 1.25rem; }
+            #infographic-system-types .icon-wrapper { padding: 1.25rem; margin-bottom: 1.25rem; }
+            #infographic-system-types .icon-wrapper svg { width: 70px; height: 70px; }
+            #infographic-system-types .info-card-title { font-size: 1.75rem; }
+            #infographic-system-types .info-description { font-size: 1.1rem; }
+        }
+
+        @media (max-width: 900px) {
+            #cpu-internal-components .main-title { font-size: 2.5rem; margin-bottom: 1.5rem; }
+            #cpu-internal-components .cpu-layout { flex-direction: column; align-items: center; gap: 1.5rem; }
+            #cpu-internal-components .diagram-section, #cpu-internal-components .description-section { width: 95%; max-width: 600px; flex: none; }
+            #cpu-internal-components .cpu-svg { height: 300px; }
+            #cpu-internal-components .component-text { font-size: 15px; }
+            #cpu-internal-components .description-title { font-size: 1.3rem; }
+            #cpu-internal-components .description-list { font-size: 0.95rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; margin-bottom: 1.5rem; }
+            #title-slide-systems-arch .icon-wrapper svg { width: 70px; height: 70px; }
+            #title-slide-systems-arch .line-h-1 { width: 70%; }
+            #title-slide-systems-arch .line-h-2 { width: 60%; }
+            #title-slide-systems-arch .line-h-3 { width: 50%; }
+            #title-slide-systems-arch .line-h-4 { width: 80%; }
+            #title-slide-systems-arch .line-v-1 { height: 60%; }
+            #title-slide-systems-arch .line-v-2 { height: 70%; }
+
+            #lecture-slide .icon-item i { font-size: 3rem; padding: 1rem; }
+            #lecture-slide .icon-container { gap: 2rem; margin-top: 2rem; }
+            #lecture-slide .icon-item { font-size: 1rem; }
+
+            #architecture-comparison-slide .architecture-card { padding: 1rem; width: 95%; }
+            #architecture-comparison-slide .architecture-name { font-size: 1.25rem; }
+            #architecture-comparison-slide .diagram-svg { height: 200px; }
+            #architecture-comparison-slide .component-text { font-size: 12px; }
+            #architecture-comparison-slide .bus-line-data, #architecture-comparison-slide .bus-line-instruction { stroke-width: 3; }
+
+            #infographic-system-types .info-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            #infographic-system-types .info-card { padding: 1.25rem; border-radius: 1rem; width: 95%; max-width: none; }
+            #infographic-system-types .icon-wrapper { padding: 1rem; margin-bottom: 1rem; }
+            #infographic-system-types .icon-wrapper svg { width: 60px; height: 60px; }
+            #infographic-system-types .info-card-title { font-size: 1.5rem; }
+            #infographic-system-types .info-description { font-size: 1rem; }
+        }
+
+        @media (max-width: 500px) {
+            #cpu-internal-components .main-title { font-size: 2rem; }
+            #cpu-internal-components .diagram-section, #cpu-internal-components .description-section { padding: 1rem; }
+            #cpu-internal-components .cpu-svg { height: 250px; }
+            #cpu-internal-components .component-text { font-size: 14px; }
+            #cpu-internal-components .component-description-card { padding: 1rem; }
+            #cpu-internal-components .description-title { font-size: 1.2rem; }
+            #cpu-internal-components .description-list { font-size: 0.9rem; }
+        }
+
+        @media (max-width: 480px) {
+            .main-title { font-size: 2rem; margin-bottom: 1rem; }
+            #title-slide-systems-arch .icon-wrapper svg { width: 50px; height: 50px; }
+
+            #lecture-slide .icon-item i { font-size: 2.5rem; padding: 0.75rem; }
+            #lecture-slide .icon-container { gap: 1.5rem; }
+            #lecture-slide .icon-item { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title Slide -->
+    <div id="title-slide-systems-arch" class="slide-container">
+        <div class="circuit-lines-background"></div> <!-- General background pattern -->
+        <div class="line-segment line-h-1"></div>
+        <div class="line-segment line-h-2"></div>
+        <div class="line-segment line-h-3"></div>
+        <div class="line-segment line-h-4"></div>
+        <div class="line-segment line-v-1"></div>
+        <div class="line-segment line-v-2"></div>
+        <div class="line-segment line-v-3"></div>
+        <div class="line-segment line-d-1"></div>
+        <div class="line-segment line-d-2"></div>
+        <div class="content-area">
+            <h1 class="main-title">Systems and Architecture</h1>
+            <div class="icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M5 3C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3H5ZM5 5H19V19H5V5ZM9 7C9.55228 7 10 7.44772 10 8V9H9C8.44772 9 8 8.55228 8 8V7C8 7.00001 8.44772 7 9 7ZM15 7C15.5523 7 16 7.44772 16 8V9H15C14.4477 9 14 8.55228 14 8V7C14 7.00001 14.4477 7 15 7ZM9 15C9.55228 15 10 15.4477 10 16V17H9C8.44772 17 8 16.5523 8 16V15C8 15 8.44772 15 9 15ZM15 15C15.5523 15 16 15.4477 16 16V17H15C14.4477 17 14 16.5523 14 16V15C14 15 14.4477 15 15 15Z" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Introduction to Computer Systems and Microprocessor Architecture -->
+    <div id="lecture-slide" class="slide-container">
+        <div class="circuit-lines-background"></div> <!-- General background pattern -->
+        <div class="content-area">
+            <h1 class="main-title title">Introduction to Computer Systems and Microprocessor Architecture</h1>
+            <div class="icon-container">
+                <div class="icon-item">
+                    <i class="fas fa-microchip rounded-full shadow-lg"></i>
+                    <span>CPU (Processor)</span>
+                </div>
+                <div class="icon-item">
+                    <i class="fas fa-memory rounded-full shadow-lg"></i>
+                    <span>Memory (RAM/ROM)</span>
+                </div>
+                <div class="icon-item">
+                    <i class="fas fa-keyboard rounded-full shadow-lg"></i>
+                    <span>I/O Devices</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Internal Components of a CPU -->
+    <div id="cpu-internal-components" class="slide-container">
+        <div class="circuit-lines-background"></div> <!-- General background pattern -->
+        <div class="content-area">
+            <h1 class="main-title">Internal Components of a CPU</h1>
+            <div class="cpu-layout">
+                <div class="diagram-section">
+                    <svg class="cpu-svg" viewBox="0 0 500 400">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7"></polygon>
+                            </marker>
+                            <marker id="arrowheadDashed" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7"></polygon>
+                            </marker>
+                        </defs>
+                        <rect class="cpu-box" x="20" y="20" width="460" height="360"></rect>
+                        <text class="component-text" x="250" y="45" font-size="20px" fill="#A0AEC0">Central Processing Unit (CPU)</text>
+                        <rect class="component-stroke component-cu" x="50" y="80" width="180" height="100"></rect>
+                        <text class="component-text" x="140" y="130">Control Unit (CU)</text>
+                        <rect class="component-stroke component-alu" x="50" y="220" width="180" height="100"></rect>
+                        <text class="component-text" x="140" y="270">Arithmetic Logic Unit (ALU)</text>
+                        <rect class="component-stroke component-registers" x="270" y="80" width="180" height="240"></rect>
+                        <text class="component-text" x="360" y="200">Registers</text>
+                        <!-- Updated arrow classes and marker-end for consistency -->
+                        <line class="flow-arrow-dashed" x1="140" y1="180" x2="140" y2="220" marker-end="url(#arrowheadDashed)"></line>
+                        <text fill="#BFDBFE" font-size="12" x="145" y="200">Control Signals</text>
+                        <line class="flow-arrow" x1="230" y1="270" x2="270" y2="270" marker-end="url(#arrowhead)"></line>
+                        <text fill="#BFDBFE" font-size="12" x="240" y="260">Data</text>
+                        <line class="flow-arrow" x1="270" y1="230" x2="230" y2="230" marker-end="url(#arrowhead)"></line>
+                        <text fill="#BFDBFE" font-size="12" x="240" y="220">Data</text>
+                        <line class="flow-arrow-dashed" x1="230" y1="130" x2="270" y2="130" marker-end="url(#arrowheadDashed)"></line>
+                        <text fill="#BFDBFE" font-size="12" x="240" y="120">Address/Control</text>
+                        <line class="flow-arrow" x1="270" y1="170" x2="230" y2="170" marker-end="url(#arrowhead)"></line>
+                        <text fill="#BFDBFE" font-size="12" x="240" y="180">Status/Data</text>
+                    </svg>
+                </div>
+                <div class="description-section">
+                    <div class="component-description-card alu">
+                        <h3 class="description-title">Arithmetic Logic Unit (ALU)</h3>
+                        <ul class="description-list">
+                            <li>Performs all arithmetic operations (addition, subtraction, etc.).</li>
+                            <li>Handles logical operations (AND, OR, NOT, XOR).</li>
+                            <li>Essential for all computations and comparisons.</li>
+                        </ul>
+                    </div>
+                    <div class="component-description-card cu">
+                        <h3 class="description-title">Control Unit (CU)</h3>
+                        <ul class="description-list">
+                            <li>Directs and coordinates all operations within the CPU.</li>
+                            <li>Fetches instructions from memory and decodes them.</li>
+                            <li>Generates control signals to execute instructions.</li>
+                        </ul>
+                    </div>
+                    <div class="component-description-card registers">
+                        <h3 class="description-title">Registers</h3>
+                        <ul class="description-list">
+                            <li>Small, high-speed storage locations within the CPU.</li>
+                            <li>Temporarily hold data and instructions being processed.</li>
+                            <li>Include Program Counter (PC), Instruction Register (IR), Accumulator, etc.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Comparing Computer Architectures -->
+    <div id="architecture-comparison-slide" class="slide-container">
+        <div class="circuit-lines-background"></div> <!-- General background pattern -->
+        <div class="content-area">
+            <h1 class="main-title">Comparing Computer Architectures</h1>
+            <div class="architecture-grid">
+                <div class="architecture-card">
+                    <h2 class="architecture-name">Von Neumann Architecture</h2>
+                    <svg class="diagram-svg" viewBox="0 0 400 250">
+                        <defs>
+                            <marker id="arrowheadDataComp" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7"></polygon>
+                            </marker>
+                            <marker id="arrowheadInstructionComp" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7"></polygon>
+                            </marker>
+                        </defs>
+                        <rect class="component-box" x="150" y="20" width="100" height="50"></rect>
+                        <text class="component-text" x="200" y="45">CPU</text>
+                        <rect class="component-box" x="20" y="180" width="100" height="50"></rect>
+                        <text class="component-text" x="70" y="205">Memory</text>
+                        <rect class="component-box" x="280" y="180" width="100" height="50"></rect>
+                        <text class="component-text" x="330" y="205">I/O</text>
+                        <line class="bus-line-data" x1="200" y1="70" x2="200" y2="170"></line>
+                        <line class="bus-line-data" x1="200" y1="170" x2="70" y2="170"></line>
+                        <line class="bus-line-data" x1="200" y1="170" x2="330" y2="170"></line>
+                        <line class="bus-line-data" x1="200" y1="170" x2="200" y2="70" marker-end="url(#arrowheadDataComp)"></line>
+                        <line class="bus-line-data" x1="70" y1="170" x2="200" y2="170" marker-end="url(#arrowheadDataComp)"></line>
+                        <line class="bus-line-data" x1="330" y1="170" x2="200" y2="170" marker-end="url(#arrowheadDataComp)"></line>
+                        <text class="bus-label" x="210" y="120" transform="rotate(90 210 120)">Shared Bus (Data & Instruction)</text>
+                    </svg>
+                </div>
+                <div class="architecture-card">
+                    <h2 class="architecture-name">Harvard Architecture</h2>
+                    <svg class="diagram-svg" viewBox="0 0 400 250">
+                        <defs>
+                            <marker id="arrowheadDataComp" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7"></polygon>
+                            </marker>
+                            <marker id="arrowheadInstructionComp" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7"></polygon>
+                            </marker>
+                        </defs>
+                        <rect class="component-box" x="150" y="20" width="100" height="50"></rect>
+                        <text class="component-text" x="200" y="45">CPU</text>
+                        <rect class="component-box" x="20" y="180" width="100" height="50"></rect>
+                        <text class="component-text" x="70" y="205">Data Mem</text>
+                        <rect class="component-box" x="280" y="180" width="100" height="50"></rect>
+                        <text class="component-text" x="330" y="205">Instruction Mem</text>
+                        <line class="bus-line-data" x1="170" y1="70" x2="70" y2="170"></line>
+                        <line class="bus-line-data" x1="70" y1="170" x2="170" y2="70" marker-end="url(#arrowheadDataComp)"></line>
+                        <text class="bus-label" x="120" y="120">Data Bus</text>
+                        <line class="bus-line-instruction" x1="230" y1="70" x2="330" y2="170"></line>
+                        <line class="bus-line-instruction" x1="330" y1="170" x2="230" y2="70" marker-end="url(#arrowheadInstructionComp)"></line>
+                        <text class="bus-label" x="280" y="120">Instruction Bus</text>
+                        <rect class="component-box" x="150" y="180" width="100" height="50"></rect>
+                        <text class="component-text" x="200" y="205">I/O</text>
+                        <line class="bus-line-data" x1="200" y1="180" x2="200" y2="150"></line>
+                        <line class="bus-line-data" x1="200" y1="150" x2="70" y2="150"></line>
+                        <line class="bus-line-data" x1="70" y1="150" x2="200" y2="150" marker-end="url(#arrowheadDataComp)"></line>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Microprocessor vs. Microcontroller vs. Embedded System Infographic -->
+    <div id="infographic-system-types" class="slide-container">
+        <div class="circuit-lines-background"></div> <!-- General background pattern -->
+        <div class="content-area">
+            <h1 class="main-title">Understanding Computer Systems: Microprocessor, Microcontroller, & Embedded System</h1>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M5 3C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3H5ZM5 5H19V19H5V5ZM9 7C9.55228 7 10 7.44772 10 8V9H9C8.44772 9 8 8.55228 8 8V7C8 7.00001 8.44772 7 9 7ZM15 7C15.5523 7 16 7.44772 16 8V9H15C14.4477 9 14 8.55228 14 8V7C14 7.00001 14.4477 7 15 7ZM9 15C9.55228 15 10 15.4477 10 16V17H9C8.44772 17 8 16.5523 8 16V15C8 15 8.44772 15 9 15ZM15 15C15.5523 15 16 15.4477 16 16V17H15C14.4477 17 14 16.5523 14 16V15C14 15 14.4477 15 15 15Z" />
+                        </svg>
+                    </div>
+                    <h3 class="info-card-title">Microprocessor (CPU)</h3>
+                    <p class="info-description">
+                        The "brain" of a computer. A single integrated circuit containing the CPU's processing capabilities. Requires external memory, I/O, and peripherals to function. High performance, general-purpose.
+                    </p>
+                </div>
+                <div class="info-card">
+                    <div class="icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 7.58172 4 12C4 7.58172 7.58172 4 12 4ZM10 8H14V16H10V8ZM12 6C9.79086 6 8 7.79086 8 10V14C8 16.2091 9.79086 18 12 18C14.2091 18 16 16.2091 16 14V10C16 7.79086 14.2091 6 12 6Z" />
+                        </svg>
+                    </div>
+                    <h3 class="info-card-title">Microcontroller (MCU)</h3>
+                    <p class="info-description">
+                        A compact, integrated chip with a CPU, memory (RAM/ROM), and I/O peripherals all on a single chip. Designed for specific, dedicated control tasks. Self-contained, lower power, cost-effective.
+                    </p>
+                </div>
+                <div class="info-card">
+                    <div class="icon-wrapper">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM12 6V18C15.3137 18 18 15.3137 18 12C18 8.68629 15.3137 6 12 6ZM12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8ZM12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10Z" /><path d="M14 9V15L17.5 12L14 9ZM7 9V15L3.5 12L7 9ZM9 14H15V17L12 20L9 17V14ZM9 7H15V4L12 1L9 4V7Z" />
+                        </svg>
+                    </div>
+                    <h3 class="info-card-title">Embedded System</h3>
+                    <p class="info-description">
+                        A computer system designed for a specific function within a larger mechanical or electrical system. It can use a microprocessor or a microcontroller, often optimized for real-time operations and resource constraints.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

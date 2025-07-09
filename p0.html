@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Architectures Comparison</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for arrows and layout to mimic diagram flow */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light background */
+            color: #334155; /* Dark gray text */
+        }
+        .architecture-container {
+            border: 2px solid #cbd5e1; /* Light border for sections */
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            padding: 1.5rem;
+            background-color: #ffffff;
+        }
+        .block-element {
+            background-color: #e2e8f0; /* Lighter background for CPU/Memory blocks */
+            border: 1px solid #94a3b8;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem; /* Spacing between internal blocks */
+        }
+        .sub-block {
+            background-color: #f8fafc; /* Even lighter for sub-units */
+            border: 1px solid #cbd5e1;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem; /* Smaller text for sub-blocks */
+        }
+        .bus-line {
+            height: 2px;
+            background-color: #64748b; /* Shared bus color */
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        .bus-label {
+            position: absolute;
+            top: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f0f4f8;
+            padding: 0 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #475569;
+            border-radius: 0.25rem;
+        }
+        .instruction-bus {
+            background-color: #ef4444; /* Red for Instruction Bus */
+            height: 2px;
+            margin: 1rem 0;
+        }
+        .data-bus {
+            background-color: #3b82f6; /* Blue for Data Bus */
+            height: 2px;
+            margin: 1rem 0;
+        }
+        .arrow-indicator {
+            position: absolute;
+            top: -8px; /* Adjust to center vertically on the line */
+            right: -10px; /* Position at the end of the line */
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 10px solid;
+        }
+        .bus-line .arrow-indicator { border-left-color: #64748b; }
+        .instruction-bus .arrow-indicator { border-left-color: #ef4444; }
+        .data-bus .arrow-indicator { border-left-color: #3b82f6; }
+
+        /* Small arrows for internal CPU flow */
+        .cpu-flow-arrow {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #64748b; /* Pointing down */
+            margin: 0.5rem auto;
+        }
+        .cpu-inter-flow-arrow {
+            width: 0;
+            height: 0;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid #64748b; /* Pointing right */
+            position: absolute;
+            right: -10px; /* Position next to the source */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Adjustments for diagram alignment */
+        .diagram-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .cpu-box {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 200px; /* Fixed width for CPU for consistency */
+            padding: 0.5rem;
+            border: 2px solid #64748b;
+            border-radius: 0.75rem;
+            background-color: #f0f9ff;
+            margin-bottom: 1rem;
+        }
+        .cpu-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .cpu-row > div {
+            flex: 1;
+            padding: 0.5rem;
+            text-align: center;
+            background-color: #e0f2fe;
+            border-radius: 0.5rem;
+            margin: 0.25rem;
+        }
+        .cpu-row.top-level {
+            margin-bottom: 0.5rem;
+        }
+
+        .memory-io-box {
+            width: 100%;
+            max-width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        .memory-block, .io-block {
+            background-color: #e0f7fa;
+            border: 1px solid #00bcd4;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .io-block {
+            background-color: #ffe0b2;
+            border-color: #ff9800;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .architecture-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .diagram-section {
+                flex-direction: column;
+            }
+            .bus-line, .instruction-bus, .data-bus {
+                width: 100%; /* Full width within its container */
+                max-width: 300px; /* Limit bus length for better visual balance */
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .cpu-box, .memory-io-box {
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-center text-blue-800 mb-10 mt-6 rounded-lg bg-blue-100 p-4 shadow-lg">
+            Comparing Computer Architectures
+        </h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 architecture-grid">
+
+            <!-- Von Neumann Architecture Section -->
+            <div class="architecture-container flex flex-col items-center">
+                <h2 class="text-3xl font-bold text-center text-purple-700 mb-6 rounded-md bg-purple-50 p-2 shadow-sm">
+                    Von Neumann Architecture
+                </h2>
+                <div class="diagram-section">
+                    <!-- CPU Box -->
+                    <div class="cpu-box">
+                        <div class="text-lg font-bold mb-2 text-purple-900">CPU</div>
+                        <div class="flex justify-between items-center w-full mb-2">
+                            <div class="sub-block">Control Unit</div>
+                            <div class="sub-block">ALU</div>
+                        </div>
+                        <div class="sub-block">Registers</div>
+                    </div>
+
+                    <!-- Shared Bus -->
+                    <div class="bus-line relative w-full max-w-sm">
+                        <span class="bus-label">Shared Bus (Address / Data)</span>
+                        <div class="arrow-indicator"></div>
+                    </div>
+
+                    <!-- Memory & I/O Box -->
+                    <div class="memory-io-box">
+                        <div class="memory-block text-lg font-bold text-teal-700">
+                            Memory (Data & Instructions)
+                        </div>
+                        <div class="bus-line relative w-2/3 my-4 mx-auto" style="height: 1px;">
+                            <span class="bus-label top-0 left-1/2 -translate-x-1/2"></span>
+                            <div class="arrow-indicator" style="right: -5px; border-left-color: #64748b;"></div>
+                        </div>
+                        <div class="io-block text-lg font-bold text-orange-700">
+                            Input/Output
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 w-full">
+                    <h3 class="text-xl font-semibold text-purple-600 mb-3">Key Features:</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li><strong class="font-bold text-purple-700">Shared Memory:</strong> Single memory space for both instructions and data.</li>
+                        <li><strong class="font-bold text-purple-700">Single Bus:</strong> One shared bus for all data transfers (instructions & data).</li>
+                        <li><strong class="font-bold text-purple-700">Sequential Access:</strong> CPU fetches instruction, then data, leading to a "bottleneck."</li>
+                        <li><strong class="font-bold text-purple-700">Simplicity:</strong> Simpler hardware design and control logic.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Harvard Architecture Section -->
+            <div class="architecture-container flex flex-col items-center">
+                <h2 class="text-3xl font-bold text-center text-green-700 mb-6 rounded-md bg-green-50 p-2 shadow-sm">
+                    Harvard Architecture
+                </h2>
+                <div class="diagram-section">
+                    <!-- CPU Box -->
+                    <div class="cpu-box">
+                        <div class="text-lg font-bold mb-2 text-green-900">CPU</div>
+                        <div class="flex justify-between items-center w-full mb-2">
+                            <div class="sub-block">Control Unit</div>
+                            <div class="sub-block">ALU</div>
+                        </div>
+                        <div class="sub-block">Registers</div>
+                    </div>
+
+                    <!-- Instruction Bus -->
+                    <div class="instruction-bus relative w-full max-w-sm">
+                        <span class="bus-label !bg-red-100 !text-red-700">Instruction Bus (Red)</span>
+                        <div class="arrow-indicator"></div>
+                    </div>
+
+                    <!-- Instruction Memory -->
+                    <div class="memory-block text-lg font-bold text-red-700 mt-2 w-full max-w-sm">
+                        Instruction Memory
+                    </div>
+
+                    <!-- Data Bus -->
+                    <div class="data-bus relative w-full max-w-sm">
+                        <span class="bus-label !bg-blue-100 !text-blue-700">Data Bus (Blue)</span>
+                        <div class="arrow-indicator"></div>
+                    </div>
+
+                    <!-- Data Memory & I/O Box -->
+                    <div class="memory-io-box">
+                        <div class="memory-block text-lg font-bold text-blue-700">
+                            Data Memory
+                        </div>
+                        <div class="bus-line relative w-2/3 my-4 mx-auto" style="height: 1px;">
+                            <span class="bus-label top-0 left-1/2 -translate-x-1/2"></span>
+                            <div class="arrow-indicator" style="right: -5px; border-left-color: #64748b;"></div>
+                        </div>
+                        <div class="io-block text-lg font-bold text-orange-700">
+                            Input/Output
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 w-full">
+                    <h3 class="text-xl font-semibold text-green-600 mb-3">Key Features:</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li><strong class="font-bold text-green-700">Separate Memories:</strong> Distinct memory spaces for instructions and data.</li>
+                        <li><strong class="font-bold text-green-700">Separate Buses:</strong> Dedicated buses for instructions and data.</li>
+                        <li><strong class="font-bold text-green-700">Parallel Access:</strong> CPU fetches instruction & data concurrently, improving performance.</li>
+                        <li><strong class="font-bold text-green-700">Complexity:</strong> More complex hardware design and control logic.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

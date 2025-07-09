@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สำรวจโลกของระบบสมองกลฝังตัว (A4 แนวนอน)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: A single static HTML page formatted to resemble an A4 document in landscape orientation. All thematic sections are presented linearly and are scrollable within the A4-like container. The "Domains of Physical Energy" section has been moved to appear immediately after the "Overview" section. A new "Memory" subsection has been added within the "Core Components" section, placed after "Processor" and before "Input/Output". This structure is optimized for a fixed-page layout, suitable for printing or viewing as a document in landscape. -->
+    <!-- Visualization & Content Choices:
+        - Overview: Goal=Inform, Method=Styled cards (HTML/Tailwind), Justification=Breaks down complex info into digestible chunks.
+        - Domains of Physical Energy: Goal=Inform/Categorize, Method=Styled cards (HTML/Tailwind), Justification=Provides foundational knowledge on physical interactions relevant to embedded systems.
+        - Components: Goal=Organize/Compare, Method=Static sections for Processor/Memory/Input/Output with side-by-side tables (HTML/Tailwind), Justification=Clear, direct comparison and structured presentation.
+        - Architecture: Goal=Compare/Inform, Method=Diagrams (HTML/Tailwind divs) for Von Neumann vs. Harvard, Static text for software types, Justification=Visual representation is crucial for architectural concepts.
+        - Examples: Goal=Inform/Relate, Method=Static image gallery with descriptions (HTML/Tailwind), Justification=Connects abstract concepts to tangible, real-world products.
+        - Evolution: Goal=Show Change, Method=Static vertical timeline (HTML/Tailwind), Justification=Effectively visualizes historical progression.
+        - Library/Method: No JavaScript libraries for interactivity. All content is pre-rendered HTML/CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #F8F7F4;
+            color: #3C3C3B;
+            margin: 0;
+            padding: 20px; /* Padding around the A4 page on screen */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            background-image: url('https://placehold.co/1920x1080/F0F0EE/F8F7F4?text=Subtle+Background'); /* Light, abstract background */
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center center;
+        }
+        .a4-page {
+            background-color: #FFFFFF;
+            width: 297mm; /* A4 Landscape width */
+            min-height: 210mm; /* A4 Landscape height */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20mm; /* Adjusted padding for landscape */
+            box-sizing: border-box;
+            margin: 20px 0; /* Margin for spacing on screen */
+            flex-shrink: 0; /* Prevent shrinking on small screens */
+            display: flex;
+            flex-direction: column;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAE8E3;
+        }
+        .timeline-item {
+            position: relative;
+            padding: 1rem 0;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background-color: #D4B2A3;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .timeline-item:nth-child(even) .timeline-content {
+            left: auto;
+            right: 50%;
+            margin-right: 1rem;
+            text-align: right;
+        }
+        .timeline-item:nth-child(odd) .timeline-content {
+            left: 50%;
+            margin-left: 1rem;
+            text-align: left;
+        }
+        .timeline-marker {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #D4B2A3;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        .timeline-content {
+            width: calc(50% - 1.5rem); /* Adjust for marker and padding */
+            padding: 1rem;
+            background-color: #FFFFFF;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        /* Responsive adjustments for timeline */
+        @media (max-width: 767px) {
+            .timeline-item::before {
+                left: 1rem;
+            }
+            .timeline-item:nth-child(even) .timeline-content,
+            .timeline-item:nth-child(odd) .timeline-content {
+                width: calc(100% - 3rem);
+                margin-left: 3rem;
+                margin-right: 0;
+                text-align: left;
+            }
+            .timeline-marker {
+                left: 1rem;
+                transform: translateX(-50%);
+            }
+            /* Adjust A4 page for smaller screens */
+            .a4-page {
+                width: 100%;
+                padding: 15mm; /* Smaller padding on mobile */
+                min-height: auto; /* Allow content to dictate height */
+                box-shadow: none;
+                margin: 0;
+            }
+            body {
+                padding: 0;
+                background-image: none; /* Remove background image on very small screens for better performance/readability */
+            }
+        }
+
+        /* Print styles for A4 Landscape */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: #FFFFFF;
+                background-image: none; /* Ensure no background image prints */
+            }
+            @page {
+                size: A4 landscape; /* Set page to A4 landscape */
+                margin: 0;
+            }
+            .a4-page {
+                width: 297mm;
+                height: 210mm;
+                min-height: 210mm;
+                box-shadow: none;
+                margin: 0;
+                padding: 20mm; /* Match screen padding for print */
+                page-break-after: always; /* Ensure each section starts on a new page if desired */
+            }
+            header, footer {
+                display: none; /* Hide header/footer in print */
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="a4-page">
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-[#3C3C3B]">สำรวจโลกของระบบสมองกลฝังตัว</h1>
+            <p class="text-sm text-gray-500">เอกสารประกอบการสอน (รูปแบบ A4 แนวนอน)</p>
+        </header>
+
+        <section id="overview" class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-bold tracking-tight">ระบบสมองกลฝังตัวคืออะไร?</h2>
+                <p class="mt-2 text-md text-gray-600">รากฐานของอุปกรณ์อัจฉริยะทุกชนิดรอบตัวเรา</p>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm mb-8">
+                <h3 class="text-lg font-bold mb-3 text-center">นิยามและหัวใจสำคัญ</h3>
+                <p class="text-gray-700 leading-relaxed text-center">
+                    ระบบสมองกลฝังตัว (Embedded System) คือระบบคอมพิวเตอร์ที่ถูกออกแบบมาเพื่อ **ทำงานเฉพาะทาง** โดยเป็นการผสานรวมกันระหว่าง **ฮาร์ดแวร์** และ **ซอฟต์แวร์** เพื่อทำหน้าที่ควบคุม ตรวจสอบ หรือตอบสนองต่อสภาพแวดล้อมภายนอก มันเป็น "สมอง" ที่ซ่อนอยู่เบื้องหลังการทำงานของอุปกรณ์ต่างๆ ทำให้เกิดความ "ฉลาด" และทำงานได้เองโดยอัตโนมัติ
+                </p>
+            </div>
+
+            <h3 class="text-lg font-bold text-center mb-6">คุณลักษณะเด่น</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card p-5 rounded-lg">
+                    <h4 class="font-bold text-md mb-1">ทำงานเฉพาะด้าน (Single Purpose)</h4>
+                    <p class="text-gray-600 text-sm">ถูกออกแบบมาเพื่องานเดียว เช่น ควบคุมอุณหภูมิในเครื่องปรับอากาศ หรือจัดการระบบเบรก ABS ในรถยนต์</p>
+                </div>
+                <div class="card p-5 rounded-lg">
+                    <h4 class="font-bold text-md mb-1">ทำงานได้เอง (Autonomous)</h4>
+                    <p class="text-gray-600 text-sm">สามารถทำงานได้ด้วยตัวเองตามที่โปรแกรมไว้ โดยไม่ต้องมีการควบคุมจากมนุษย์ตลอดเวลา และมักทำงานแบบ Real-time</p>
+                </div>
+                <div class="card p-5 rounded-lg">
+                    <h4 class="font-bold text-md mb-1">เชื่อถือได้สูง (High Reliability)</h4>
+                    <p class="text-gray-600 text-sm">ต้องทำงานได้อย่างถูกต้องและต่อเนื่อง เพราะความผิดพลาดอาจนำไปสู่ความเสียหายร้ายแรงได้</p>
+                </div>
+                <div class="card p-5 rounded-lg">
+                    <h4 class="font-bold text-md mb-1">ประหยัดพลังงาน (Energy Efficient)</h4>
+                    <p class="text-gray-600 text-sm">มักใช้พลังงานต่ำเพื่อให้ทำงานกับแบตเตอรี่ได้เป็นเวลานาน</p>
+                </div>
+                <div class="card p-5 rounded-lg">
+                    <h4 class="font-bold text-md mb-1">ต้นทุนต่ำ (Low Cost)</h4>
+                    <p class="text-gray-600 text-sm">เนื่องจากผลิตในปริมาณมาก ต้นทุนต่อหน่วยจึงต้องต่ำเพื่อให้ผลิตภัณฑ์สามารถแข่งขันในตลาดได้</p>
+                </div>
+                <div class="card p-5 rounded-lg">
+                    <h4 class="font-bold text-md mb-1">ขนาดเล็ก (Compact Size)</h4>
+                    <p class="text-gray-600 text-sm">ต้องมีขนาดเล็กพอที่จะ "ฝัง" เข้าไปในอุปกรณ์หรือระบบที่ใหญ่กว่าได้</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="energy-domains" class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-bold tracking-tight">6 โดเมนของพลังงานทางกายภาพ</h2>
+                <p class="mt-2 text-md text-gray-600">วิธีที่ระบบสมองกลฝังตัวรับรู้และโต้ตอบกับโลกทางกายภาพ</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                <p class="text-gray-700 leading-relaxed text-center mb-6">
+                    ระบบสมองกลฝังตัวทำงานโดยการแปลงพลังงานจากโดเมนหนึ่งไปอีกโดเมนหนึ่งผ่านเซ็นเซอร์และแอคทูเอเตอร์ โดเมนพลังงานหลัก 6 ประเภทที่เกี่ยวข้องกับการทำงานของระบบเหล่านี้ได้แก่:
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-1">1. พลังงานรังสี (Radiant)</h4>
+                        <p class="text-gray-600 text-sm">เกี่ยวข้องกับแสง (Light), คลื่นแม่เหล็กไฟฟ้า (Electromagnetic Waves) เช่น เซ็นเซอร์แสง, กล้อง</p>
+                    </div>
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-1">2. พลังงานกล (Mechanical)</h4>
+                        <p class="text-gray-600 text-sm">เกี่ยวข้องกับการเคลื่อนที่ (Motion), แรง (Force), ความดัน (Pressure) เช่น เซ็นเซอร์ความเร่ง, มอเตอร์</p>
+                    </div>
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-1">3. พลังงานความร้อน (Thermal)</h4>
+                        <p class="text-gray-600 text-sm">เกี่ยวข้องกับความร้อน (Heat), อุณหภูมิ (Temperature) เช่น เซ็นเซอร์อุณหภูมิ, ฮีตเตอร์</p>
+                    </div>
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-1">4. พลังงานไฟฟ้า (Electrical)</h4>
+                        <p class="text-gray-600 text-sm">เกี่ยวข้องกับแรงดันไฟฟ้า (Voltage), กระแสไฟฟ้า (Current) ซึ่งเป็นพื้นฐานการทำงานของวงจร</p>
+                    </div>
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-1">5. พลังงานเคมี (Chemical)</h4>
+                        <p class="text-gray-600 text-sm">เกี่ยวข้องกับองค์ประกอบทางเคมี (Composition), ปฏิกิริยา (Reactions) เช่น เซ็นเซอร์แก๊ส, แบตเตอรี่</p>
+                    </div>
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-1">6. พลังงานแม่เหล็ก (Magnetic)</h4>
+                        <p class="text-gray-600 text-sm">เกี่ยวข้องกับสนามแม่เหล็ก (Magnetic Fields) เช่น เซ็นเซอร์เข็มทิศ, มอเตอร์บางชนิด</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="components" class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-bold tracking-tight">ส่วนประกอบหลักของระบบ</h2>
+                <p class="mt-2 text-md text-gray-600">องค์ประกอบสำคัญที่ทำงานร่วมกันเพื่อสร้างระบบสมองกลฝังตัวที่สมบูรณ์</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-xl shadow-sm">
+                <h3 class="text-lg font-bold text-center mb-3">🧠 โพรเซสเซอร์: สมองของระบบ</h3>
+                <p class="text-center text-gray-600 text-sm mb-6">หน่วยประมวลผลกลางที่ทำหน้าที่คำนวณและตัดสินใจตามโปรแกรมที่กำหนดไว้ มี 2 ประเภทหลักที่ใช้ในระบบสมองกลฝังตัว</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="border border-gray-200 p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-2">ไมโครโปรเซสเซอร์ (μP)</h4>
+                        <p class="text-sm text-gray-600 mb-3">เป็นแค่ CPU ต้องต่อพ่วงกับ RAM, ROM และ I/O ภายนอก</p>
+                        <ul class="space-y-1 text-sm">
+                            <li><span class="text-green-500 mr-1">✔</span> มีความยืดหยุ่นสูงในการออกแบบ</li>
+                            <li><span class="text-green-500 mr-1">✔</span> ประสิทธิภาพสูง เหมาะกับงานซับซ้อน</li>
+                            <li><span class="text-red-500 mr-1">✘</span> ขนาดใหญ่และซับซ้อนกว่า</li>
+                            <li><span class="text-red-500 mr-1">✘</span> ใช้พลังงานมากกว่า</li>
+                        </ul>
+                    </div>
+                    <div class="border border-gray-200 p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-2">ไมโครคอนโทรลเลอร์ (μC)</h4>
+                        <p class="text-sm text-gray-600 mb-3">รวม CPU, RAM, ROM, I/O ไว้ในชิปเดียว (System-on-a-Chip)</p>
+                        <ul class="space-y-1 text-sm">
+                            <li><span class="text-green-500 mr-1">✔</span> ขนาดเล็กและต้นทุนต่ำ</li>
+                            <li><span class="text-green-500 mr-1">✔</span> ประหยัดพลังงาน</li>
+                            <li><span class="text-green-500 mr-1">✔</span> ออกแบบง่ายและรวดเร็ว</li>
+                            <li><span class="text-red-500 mr-1">✘</span> ประสิทธิภาพและความจุจำกัด</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-bold text-center mb-3">💾 หน่วยความจำ (Memory)</h3>
+                <p class="text-center text-gray-600 text-sm mb-6">ส่วนสำคัญสำหรับจัดเก็บโปรแกรมและข้อมูลที่ใช้ในการทำงานของระบบสมองกลฝังตัว</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="border border-gray-200 p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-2">ROM (Read-Only Memory)</h4>
+                        <p class="text-sm text-gray-600 mb-3">หน่วยความจำแบบอ่านอย่างเดียว ใช้เก็บโปรแกรม (Firmware) ที่ไม่เปลี่ยนแปลง</p>
+                        <ul class="space-y-1 text-sm">
+                            <li><span class="text-green-500 mr-1">✔</span> ข้อมูลไม่หายเมื่อปิดเครื่อง</li>
+                            <li><span class="text-green-500 mr-1">✔</span> เหมาะสำหรับเก็บโปรแกรมหลัก</li>
+                            <li><span class="text-red-500 mr-1">✘</span> เขียนข้อมูลซ้ำได้จำกัด (หรือไม่ได้เลย)</li>
+                        </ul>
+                    </div>
+                    <div class="border border-gray-200 p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-2">RAM (Random Access Memory)</h4>
+                        <p class="text-sm text-gray-600 mb-3">หน่วยความจำแบบเข้าถึงโดยสุ่ม ใช้เก็บข้อมูลชั่วคราวที่กำลังประมวลผล</p>
+                        <ul class="space-y-1 text-sm">
+                            <li><span class="text-green-500 mr-1">✔</span> เขียนและอ่านข้อมูลได้รวดเร็ว</li>
+                            <li><span class="text-green-500 mr-1">✔</span> เหมาะสำหรับเก็บข้อมูลที่เปลี่ยนแปลงบ่อย</li>
+                            <li><span class="text-red-500 mr-1">✘</span> ข้อมูลหายเมื่อปิดเครื่อง</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-bold text-center mb-3">👁️ อินพุต: การรับรู้จากโลกภายนอก</h3>
+                <p class="text-center text-gray-600 text-sm mb-6">เซ็นเซอร์ทำหน้าที่แปลงค่าทางกายภาพ (เช่น อุณหภูมิ, แสง, การเคลื่อนไหว) ให้เป็นสัญญาณไฟฟ้าเพื่อให้ระบบประมวลผลได้</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-center mb-8">
+                    <div class="card p-3 rounded-lg"><p class="text-sm">🌡️ Temperature</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">💡 Light (LDR)</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">🏃‍♂️ Acceleration</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">💨 Pressure</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">💧 Humidity</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">📍 Proximity</p></div>
+                </div>
+
+                <h3 class="text-lg font-bold text-center mb-3">🦾 เอาต์พุต: การกระทำต่อโลกภายนอก</h3>
+                <p class="text-center text-gray-600 text-sm mb-6">แอคทูเอเตอร์ทำหน้าที่แปลงสัญญาณไฟฟ้ากลับเป็นพลังงานกลหรือการกระทำทางกายภาพ เพื่อควบคุมอุปกรณ์ต่างๆ</p>
+                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-center">
+                    <div class="card p-3 rounded-lg"><p class="text-sm">💡 LED / Display</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">⚙️ Motors (DC, Servo)</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">🔊 Speaker / Buzzer</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">🔄 Relay</p></div>
+                    <div class="card p-3 rounded-lg"><p class="text-sm">밸 Solenoid</p></div>
+                     <div class="card p-3 rounded-lg"><p class="text-sm">🔥 Heater</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-bold tracking-tight">สถาปัตยกรรมและซอฟต์แวร์</h2>
+                <p class="mt-2 text-md text-gray-600">โครงสร้างพื้นฐานและโปรแกรมที่ขับเคลื่อนระบบให้ทำงานตามเป้าหมาย</p>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm mb-8">
+                <h3 class="text-lg font-bold text-center mb-6">สถาปัตยกรรมคอมพิวเตอร์</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div>
+                        <h4 class="font-bold text-md text-center mb-2">Von Neumann</h4>
+                        <p class="text-sm text-gray-600 text-center mb-3">เก็บโปรแกรมและข้อมูลในหน่วยความจำเดียวกัน ใช้บัสร่วมกัน</p>
+                        <div class="border border-gray-300 rounded-lg p-4 bg-white text-center">
+                            <div class="font-mono text-sm">CPU ↔️ [BUS] ↔️ [MEMORY (Program + Data)]</div>
+                            <p class="mt-3 text-xs text-gray-500">เรียบง่าย แต่เกิดปัญหาคอขวด (bottleneck) เพราะต้องเข้าถึงหน่วยความจำทีละอย่าง</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-md text-center mb-2">Harvard</h4>
+                        <p class="text-sm text-gray-600 text-center mb-3">แยกหน่วยความจำสำหรับโปรแกรมและข้อมูลออกจากกัน มีบัสแยกกัน</p>
+                        <div class="border border-gray-300 rounded-lg p-4 bg-white text-center">
+                             <div class="font-mono text-sm">CPU ↔️ [PROG BUS] ↔️ [PROGRAM MEMORY]</div>
+                             <div class="font-mono text-sm mt-1">CPU ↔️ [DATA BUS] ↔️ [DATA MEMORY]</div>
+                             <p class="mt-3 text-xs text-gray-500">ทำงานเร็วกว่าเพราะเข้าถึงโปรแกรมและข้อมูลได้พร้อมกัน นิยมในไมโครคอนโทรลเลอร์</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                <h3 class="text-lg font-bold text-center mb-6">รูปแบบซอฟต์แวร์ในระบบสมองกลฝังตัว</h3>
+                <p class="text-center text-gray-600 text-sm mb-6">ซอฟต์แวร์หรือ "เฟิร์มแวร์" มีหลายรูปแบบ ขึ้นอยู่กับความซับซ้อนและความต้องการในการตอบสนองของระบบ</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-2">Simple Control Loop</h4>
+                        <p class="text-gray-600 text-sm">ซอฟต์แวร์ทำงานในลูปที่ไม่มีวันสิ้นสุด เหมาะสำหรับงานควบคุมที่ไม่ซับซ้อน</p>
+                    </div>
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-2">Interrupt-controlled System</h4>
+                        <p class="text-gray-600 text-sm">ระบบจะอยู่ในสภาวะพักและถูกเรียกให้ทำงานเมื่อมีเหตุการณ์ที่กำหนด (เช่น Timer, External Interrupt)</p>
+                    </div>
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-2">Cooperative Multitasking</h4>
+                        <p class="text-gray-600 text-sm">ทำงานคล้ายวนลูปแต่เพิ่ม Task ได้ง่ายกว่า โดย Task จะต้องคืนการควบคุมเอง</p>
+                    </div>
+                    <div class="card p-5 rounded-lg">
+                        <h4 class="font-bold text-md mb-2">Preemptive Multitasking (RTOS)</h4>
+                        <p class="text-gray-600 text-sm">มักพัฒนาเป็นระบบปฏิบัติการแบบเรียลไทม์ (RTOS) มีการจัดสรรเวลาทำงานของ Task โดยระบบ</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="examples" class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-bold tracking-tight">ตัวอย่างการใช้งานในชีวิตประจำวัน</h2>
+                <p class="mt-2 text-md text-gray-600">ระบบสมองกลฝังตัวซ่อนอยู่ในอุปกรณ์มากมายรอบตัวเรา</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="card rounded-lg overflow-hidden">
+                    <img src="https://placehold.co/600x400/D4B2A3/FFFFFF?text=Car+ECU" alt="รถยนต์" class="w-full h-32 object-cover">
+                    <div class="p-3 bg-white">
+                        <h4 class="font-bold text-md mb-1">รถยนต์</h4>
+                        <p class="text-xs text-gray-600">รถยนต์สมัยใหม่มีระบบสมองกลฝังตัว (ECU) หลายสิบตัว ทำหน้าที่ควบคุมทุกอย่าง</p>
+                    </div>
+                </div>
+                <div class="card rounded-lg overflow-hidden">
+                    <img src="https://placehold.co/600x400/A49E9E/FFFFFF?text=Washing+Machine+Control" alt="เครื่องซักผ้า" class="w-full h-32 object-cover">
+                    <div class="p-3 bg-white">
+                        <h4 class="font-bold text-md mb-1">เครื่องซักผ้า</h4>
+                        <p class="text-xs text-gray-600">ไมโครคอนโทรลเลอร์ควบคุมมอเตอร์, วาล์วน้ำ, และฮีตเตอร์ให้ทำงานตามขั้นตอน</p>
+                    </div>
+                </div>
+                <div class="card rounded-lg overflow-hidden">
+                    <img src="https://placehold.co/600x400/3C3C3B/FFFFFF?text=Microwave+Panel" alt="เตาไมโครเวฟ" class="w-full h-32 object-cover">
+                    <div class="p-3 bg-white">
+                        <h4 class="font-bold text-md mb-1">เตาไมโครเวฟ</h4>
+                        <p class="text-xs text-gray-600">ระบบสมองกลฝังตัวทำหน้าที่อ่านคำสั่ง, ควบคุมเวลา, และกำลังวัตต์ของคลื่นไมโครเวฟ</p>
+                    </div>
+                </div>
+                <div class="card rounded-lg overflow-hidden">
+                    <img src="https://placehold.co/600x400/D4B2A3/FFFFFF?text=Digital+Camera+Lens" alt="กล้องดิจิทัล" class="w-full h-32 object-cover">
+                    <div class="p-3 bg-white">
+                        <h4 class="font-bold text-md mb-1">กล้องดิจิทัล</h4>
+                        <p class="text-xs text-gray-600">มีระบบประมวลผลภาพที่ซับซ้อนเพื่อจัดการข้อมูลจากเซ็นเซอร์รับภาพและปรับโฟกัส</p>
+                    </div>
+                </div>
+                <div class="card rounded-lg overflow-hidden">
+                    <img src="https://placehold.co/600x400/A49E9E/FFFFFF?text=Blood+Pressure+Monitor" alt="เครื่องวัดความดัน" class="w-full h-32 object-cover">
+                    <div class="p-3 bg-white">
+                        <h4 class="font-bold text-md mb-1">เครื่องวัดความดัน</h4>
+                        <p class="text-xs text-gray-600">เซ็นเซอร์วัดความดันส่งข้อมูลไปยังไมโครคอนโทรลเลอร์เพื่อคำนวณและแสดงผล</p>
+                    </div>
+                </div>
+                <div class="card rounded-lg overflow-hidden">
+                    <img src="https://placehold.co/600x400/3C3C3B/FFFFFF?text=Printer+Tray" alt="เครื่องพิมพ์" class="w-full h-32 object-cover">
+                    <div class="p-3 bg-white">
+                        <h4 class="font-bold text-md mb-1">เครื่องพิมพ์</h4>
+                        <p class="text-xs text-gray-600">รับข้อมูลจากคอมพิวเตอร์, แปลงเป็นคำสั่ง, และควบคุมการเคลื่อนที่ของหัวพิมพ์</p>
+                    </div>
+                </div>
+                <div class="card rounded-lg overflow-hidden">
+                    <img src="https://placehold.co/600x400/D4B2A3/FFFFFF?text=AC+Remote" alt="เครื่องปรับอากาศ" class="w-full h-32 object-cover">
+                    <div class="p-3 bg-white">
+                        <h4 class="font-bold text-md mb-1">เครื่องปรับอากาศ</h4>
+                        <p class="text-xs text-gray-600">ใช้เซ็นเซอร์อุณหภูมิในการตรวจสอบและควบคุมการทำงานของคอมเพรสเซอร์</p>
+                    </div>
+                </div>
+                <div class="card rounded-lg overflow-hidden">
+                    <img src="https://placehold.co/600x400/A49E9E/FFFFFF?text=Smartphone+Screen" alt="สมาร์ทโฟน" class="w-full h-32 object-cover">
+                    <div class="p-3 bg-white">
+                        <h4 class="font-bold text-md mb-1">สมาร์ทโฟน</h4>
+                        <p class="text-xs text-gray-600">เป็นตัวอย่างของระบบสมองกลฝังตัวที่ซับซ้อนที่สุด ประกอบด้วยโปรเซสเซอร์หลักและร่วม</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="evolution" class="mb-12">
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-bold tracking-tight">วิวัฒนาการของระบบอัตโนมัติ</h2>
+                <p class="mt-2 text-md text-gray-600">จากกลไกธรรมดาสู่สมองกลอัจฉริยะ</p>
+            </div>
+            <div class="relative wrap overflow-hidden p-6 h-full">
+                <div class="border-l-2 border-gray-200 absolute h-full" style="left: 50%; transform: translateX(-1px);"></div>
+                
+                <div class="flex justify-between items-center w-full mb-6">
+                    <div class="w-5/12"></div>
+                    <div class="timeline-marker flex-shrink-0 flex items-center justify-center text-white font-semibold text-sm">1</div>
+                    <div class="timeline-content w-5/12">
+                        <h3 class="font-bold text-gray-800 text-md">~1769: ยุคปฏิวัติอุตสาหกรรม</h3>
+                        <p class="text-xs leading-snug tracking-wide text-gray-600">Watt Flyball Governor: อุปกรณ์ควบคุมความเร็วเครื่องจักรไอน้ำอัตโนมัติ</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between flex-row-reverse items-center w-full mb-6">
+                    <div class="w-5/12"></div>
+                    <div class="timeline-marker flex-shrink-0 flex items-center justify-center text-white font-semibold text-sm">2</div>
+                    <div class="timeline-content w-5/12">
+                        <h3 class="font-bold text-gray-800 text-md">~1960s: ยุคอวกาศ</h3>
+                        <p class="text-xs leading-snug tracking-wide text-gray-600">Apollo Guidance Computer: คอมพิวเตอร์นำทางในยานอพอลโล ใช้ IC รุ่นแรกๆ</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-center w-full mb-6">
+                    <div class="w-5/12"></div>
+                    <div class="timeline-marker flex-shrink-0 flex items-center justify-center text-white font-semibold text-sm">3</div>
+                    <div class="timeline-content w-5/12">
+                        <h3 class="font-bold text-gray-800 text-md">1971: กำเนิดไมโครโปรเซสเซอร์</h3>
+                        <p class="text-xs leading-snug tracking-wide text-gray-600">Intel 4004: ไมโครโปรเซสเซอร์เชิงพาณิชย์ตัวแรก</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between flex-row-reverse items-center w-full mb-6">
+                    <div class="w-5/12"></div>
+                    <div class="timeline-marker flex-shrink-0 flex items-center justify-center text-white font-semibold text-sm">4</div>
+                    <div class="timeline-content w-5/12">
+                        <h3 class="font-bold text-gray-800 text-md">ปัจจุบัน: ยุค IoT</h3>
+                        <p class="text-xs leading-snug tracking-wide text-gray-600">Internet of Things: อุปกรณ์นับพันล้านชิ้นทั่วโลกมีระบบสมองกลฝังตัวและเชื่อมต่อกับอินเทอร์เน็ต</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คู่มือสำรวจการทำงานของ CPU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Neutrals (#f5f5f4, #44403c, #2dd4bf) -->
+    <!-- Application Structure Plan: A multi-section SPA with a top navigation bar. The structure flows from a high-level interactive diagram of CPU components to a step-by-step simulation of the Fetch-Decode-Execute cycle, followed by interactive deep dives into Registers and Flags. This structure was chosen to guide the user from general concepts to specific, hands-on examples, making abstract computer architecture principles tangible and easier to learn than a static report. -->
+    <!-- Visualization & Content Choices: 1. CPU Components: Goal=Organize, Method=Interactive HTML/CSS diagram, Interaction=Click to highlight/show info. Justification=Visually shows relationships between parts. 2. CPU Cycle: Goal=Process Flow, Method=Step-by-step animation with HTML/CSS/JS, Interaction=Button click to advance. Justification=Makes the abstract cycle easy to follow. 3. Registers: Goal=Inform, Method=Accordion/tabs with HTML/CSS/JS. Justification=Organizes dense information cleanly. 4. Flags: Goal=Show Relationship, Method=Interactive ALU simulator with HTML/CSS/JS, Interaction=User inputs data and sees flags change. Justification=Directly demonstrates cause and effect of flag states. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #44403c; /* stone-700 */
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link.active {
+            color: #0d9488; /* teal-600 */
+            border-bottom-color: #0d9488;
+        }
+        .component-box {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .component-box:hover, .component-box.active {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #14b8a6; /* teal-500 */
+        }
+        .connector {
+            position: absolute;
+            background-color: #a8a29e; /* stone-400 */
+            transition: background-color 0.3s;
+        }
+        .connector.active {
+            background-color: #f97316; /* orange-500 */
+        }
+        .highlight-anim {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+        .flag-indicator {
+            transition: all 0.3s;
+        }
+        .flag-indicator.set {
+            background-color: #10b981; /* emerald-500 */
+            color: white;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-teal-700">สำรวจ CPU</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#section-overview" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">ภาพรวม</a>
+                        <a href="#section-cycle" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">วัฏจักรการทำงาน</a>
+                        <a href="#section-registers" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">เจาะลึก: รีจิสเตอร์</a>
+                        <a href="#section-flags" class="nav-link px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">เจาะลึก: แฟล็ก</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        
+        <section id="section-overview" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-4 text-teal-800">ส่วนประกอบหลักของ CPU</h2>
+            <p class="text-center max-w-3xl mx-auto text-lg text-stone-600 mb-12">
+                CPU เปรียบเสมือนสมองของคอมพิวเตอร์ ประกอบด้วยส่วนสำคัญหลายอย่างที่ทำงานประสานกันอย่างซับซ้อน คลิกที่ส่วนประกอบแต่ละชิ้นเพื่อดูรายละเอียดหน้าที่และเรียนรู้ว่ามันเชื่อมโยงกันอย่างไร
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                <div id="component-info" class="lg:col-span-1 p-6 bg-white rounded-xl shadow-lg min-h-[300px] flex flex-col justify-center">
+                    <h3 id="info-title" class="text-2xl font-bold mb-2 text-teal-700">เลือกส่วนประกอบ</h3>
+                    <p id="info-desc" class="text-stone-600">คลิกที่ส่วนประกอบในแผนภาพเพื่อดูคำอธิบายที่นี่</p>
+                    <p id="info-analogy" class="mt-4 text-sm text-stone-500 italic"></p>
+                </div>
+                <div class="lg:col-span-2 relative h-[400px]">
+                    <div id="overview-cu" data-id="cu" class="component-box absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 border-2 border-stone-300 rounded-lg bg-white w-40 text-center">
+                        <h4 class="font-bold">หน่วยควบคุม (CU)</h4>
+                    </div>
+                    <div id="overview-alu" data-id="alu" class="component-box absolute top-3/4 left-1/2 -translate-x-1/2 p-4 border-2 border-stone-300 rounded-lg bg-white w-40 text-center">
+                        <h4 class="font-bold">ALU</h4>
+                    </div>
+                    <div id="overview-registers" data-id="registers" class="component-box absolute top-1/4 left-1/2 -translate-x-1/2 p-4 border-2 border-stone-300 rounded-lg bg-white w-40 text-center">
+                        <h4 class="font-bold">รีจิสเตอร์</h4>
+                    </div>
+                    <div id="overview-ram" data-id="ram" class="component-box absolute top-1/2 left-8 -translate-y-1/2 p-4 border-2 border-stone-300 rounded-lg bg-white w-28 text-center">
+                        <h4 class="font-bold">RAM</h4>
+                    </div>
+                     <div id="overview-cache" data-id="cache" class="component-box absolute top-1/2 left-1/2 -translate-x-[220px] -translate-y-1/2 p-2 border-2 border-dashed border-stone-300 rounded-lg bg-white w-28 text-center text-sm">
+                        <h4 class="font-bold">Cache</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <hr class="my-24 border-stone-300">
+
+        <section id="section-cycle" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-4 text-teal-800">วัฏจักรการทำงานของ CPU ในหนึ่งคำสั่ง</h2>
+             <p class="text-center max-w-3xl mx-auto text-lg text-stone-600 mb-12">
+                การประมวลผลทุกคำสั่งของ CPU จะผ่านวัฏจักรพื้นฐานที่เรียกว่า "Fetch-Decode-Execute" ลองกดปุ่ม "ขั้นตอนถัดไป" เพื่อดูการทำงานทีละขั้นตอน กับตัวอย่างคำสั่ง `ADD EAX, 10` ซึ่งหมายถึงการบวกค่า 10 เข้าไปในรีจิสเตอร์ EAX
+            </p>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="border p-4 rounded-lg bg-stone-50">
+                        <h4 class="font-bold text-center mb-2">หน่วยความจำ (RAM)</h4>
+                        <div id="cycle-ram-content" class="text-sm font-mono space-y-1">
+                            <div><span class="text-gray-400">0100:</span> <span class="text-blue-600">ADD EAX, 10</span></div>
+                            <div><span class="text-gray-400">0101:</span> ...</div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 border p-4 rounded-lg bg-stone-50">
+                        <h4 class="font-bold text-center mb-2">CPU</h4>
+                         <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h5 class="font-semibold text-sm mb-2">รีจิสเตอร์เฉพาะกิจ</h5>
+                                <div class="font-mono text-sm space-y-1">
+                                    <div class="flex justify-between"><span>PC:</span> <span id="cycle-pc" class="font-bold text-red-600">0100</span></div>
+                                    <div class="flex justify-between"><span>IR:</span> <span id="cycle-ir">-</span></div>
+                                </div>
+                                <h5 class="font-semibold text-sm mt-4 mb-2">รีจิสเตอร์เอนกประสงค์</h5>
+                                <div class="font-mono text-sm space-y-1">
+                                    <div class="flex justify-between"><span>EAX:</span> <span id="cycle-eax" class="font-bold text-green-700">5</span></div>
+                                </div>
+                            </div>
+                             <div>
+                                <h5 class="font-semibold text-sm mb-2">หน่วยควบคุมและคำนวณ</h5>
+                                <div id="cycle-cu" class="p-2 border rounded text-center my-2 transition">CU</div>
+                                <div id="cycle-alu" class="p-2 border rounded text-center my-2 transition">ALU</div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div id="cycle-explanation" class="min-h-[50px] mb-6 p-4 bg-teal-50 text-teal-800 rounded-lg text-lg">เริ่มต้น: โปรแกรมเคาน์เตอร์ (PC) ชี้ไปที่คำสั่งถัดไปใน RAM</div>
+                    <button id="cycle-next-btn" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition-transform duration-200 hover:scale-105">ขั้นตอนถัดไป</button>
+                    <button id="cycle-reset-btn" class="bg-stone-500 hover:bg-stone-600 text-white font-bold py-2 px-4 rounded-lg transition-transform duration-200 hover:scale-105 ml-4">รีเซ็ต</button>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-24 border-stone-300">
+
+        <section id="section-registers" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-4 text-teal-800">เจาะลึก: รีจิสเตอร์</h2>
+            <p class="text-center max-w-3xl mx-auto text-lg text-stone-600 mb-12">
+                รีจิสเตอร์คือหน่วยความจำที่เร็วที่สุดในคอมพิวเตอร์ ทำหน้าที่เป็น "โต๊ะทำงาน" ของ CPU มีหลายประเภท แต่ละประเภทมีหน้าที่เฉพาะตัว คลิกที่แท็บด้านล่างเพื่อสำรวจรีจิสเตอร์แต่ละกลุ่ม
+            </p>
+            <div>
+                <div class="flex border-b border-stone-300">
+                    <button data-tab="gpr" class="tab-btn py-2 px-4 font-semibold border-b-2 border-teal-600 text-teal-600">เอนกประสงค์ (GPRs)</button>
+                    <button data-tab="spr" class="tab-btn py-2 px-4 font-semibold text-stone-500 border-b-2 border-transparent">เฉพาะกิจ (SPRs)</button>
+                </div>
+                <div id="gpr-content" class="tab-content p-6 bg-white rounded-b-xl rounded-r-xl">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">EAX (Accumulator)</h5> <p class="text-sm">ใช้เก็บผลลัพธ์จากการคำนวณ</p> </div>
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">EBX (Base)</h5> <p class="text-sm">มักใช้เป็นตัวชี้ฐานของข้อมูล</p> </div>
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">ECX (Counter)</h5> <p class="text-sm">ใช้เป็นตัวนับในลูป</p> </div>
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">EDX (Data)</h5> <p class="text-sm">ใช้เก็บข้อมูลสำหรับการคำนวณ</p> </div>
+                    </div>
+                </div>
+                <div id="spr-content" class="tab-content p-6 bg-white rounded-b-xl rounded-r-xl hidden">
+                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">PC / IP</h5> <p class="text-sm">ชี้ตำแหน่งคำสั่งถัดไป</p> </div>
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">IR</h5> <p class="text-sm">เก็บคำสั่งที่กำลังประมวลผล</p> </div>
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">MAR</h5> <p class="text-sm">เก็บที่อยู่หน่วยความจำที่จะเข้าถึง</p> </div>
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">MDR</h5> <p class="text-sm">พักข้อมูลที่อ่าน/เขียนกับ RAM</p> </div>
+                        <div class="p-4 bg-stone-50 rounded-lg"> <h5 class="font-bold">SP</h5> <p class="text-sm">ชี้ตำแหน่งบนสุดของ Stack</p> </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-24 border-stone-300">
+
+        <section id="section-flags" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-4 text-teal-800">เจาะลึก: แฟล็ก</h2>
+            <p class="text-center max-w-3xl mx-auto text-lg text-stone-600 mb-12">
+                ทุกครั้งที่ ALU ทำการคำนวณ มันจะตั้งค่า "แฟล็ก" ต่างๆ เพื่อบอกสถานะของผลลัพธ์ แฟล็กเหล่านี้สำคัญมากต่อการตัดสินใจของโปรแกรม เช่น การทำคำสั่งแบบมีเงื่อนไข ลองป้อนค่าและดำเนินการด้านล่างเพื่อดูว่าแฟล็กเปลี่ยนไปอย่างไร
+            </p>
+            <div class="bg-white p-8 rounded-xl shadow-lg flex flex-col lg:flex-row gap-8 items-center">
+                <div class="flex-grow w-full">
+                    <div class="flex items-center gap-4 mb-4">
+                        <input id="flag-val1" type="number" value="10" class="w-full p-2 border border-stone-300 rounded-lg text-center font-mono text-xl">
+                        <select id="flag-op" class="p-2 border border-stone-300 rounded-lg text-xl">
+                            <option value="add">+</option>
+                            <option value="sub">-</option>
+                        </select>
+                        <input id="flag-val2" type="number" value="10" class="w-full p-2 border border-stone-300 rounded-lg text-center font-mono text-xl">
+                        <button id="flag-exec-btn" class="p-2 bg-teal-600 text-white rounded-lg text-xl font-bold hover:bg-teal-700 w-20">=</button>
+                    </div>
+                    <div class="text-center bg-stone-100 p-4 rounded-lg">
+                        <span class="text-2xl font-mono" id="flag-result">?</span>
+                    </div>
+                </div>
+                <div class="flex-shrink-0 grid grid-cols-5 gap-3 text-center">
+                    <div> <div id="flag-zf" class="flag-indicator w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center font-bold text-2xl">0</div> <p class="text-sm mt-2">Zero</p> </div>
+                    <div> <div id="flag-sf" class="flag-indicator w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center font-bold text-2xl">0</div> <p class="text-sm mt-2">Sign</p> </div>
+                    <div> <div id="flag-cf" class="flag-indicator w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center font-bold text-2xl">0</div> <p class="text-sm mt-2">Carry</p> </div>
+                    <div> <div id="flag-of" class="flag-indicator w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center font-bold text-2xl">0</div> <p class="text-sm mt-2">Overflow</p> </div>
+                    <div> <div id="flag-pf" class="flag-indicator w-16 h-16 rounded-full bg-stone-200 flex items-center justify-center font-bold text-2xl">0</div> <p class="text-sm mt-2">Parity</p> </div>
+                </div>
+            </div>
+             <div id="flag-explanation" class="mt-6 p-4 bg-stone-100 text-stone-700 rounded-lg min-h-[40px]">คำอธิบายแฟล็กจะปรากฏที่นี่...</div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-white mt-24">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-stone-500">
+             <p>สร้างสรรค์โดย ปิยะ จิตต์ถมังภิรมย์, 7/7/2025</p>
+             <p class="text-sm mt-1">เว็บแอปพลิเคชันเพื่อการศึกษา สถาปัตยกรรมคอมพิวเตอร์เบื้องต้น</p>
+        </div>
+    </footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Section 1: Overview Interaction
+    const components = {
+        cu: { title: "หน่วยควบคุม (CU)", desc: "ทำหน้าที่ควบคุมและประสานงานการทำงานของส่วนต่างๆ ทั้งหมดใน CPU เปรียบเสมือนผู้จัดการหรือวาทยกร", analogy: "เปรียบเหมือน: หัวหน้าเชฟที่คอยอ่านใบสั่งและสั่งงานลูกมือ" },
+        alu: { title: "หน่วยคำนวณและตรรกะ (ALU)", desc: "ส่วนที่ทำการคำนวณทางคณิตศาสตร์ (บวก, ลบ) และดำเนินการทางตรรกะ (เปรียบเทียบ) จริงๆ", analogy: "เปรียบเหมือน: เครื่องคิดเลขและเครื่องมือวัดที่แม่นยำในครัว" },
+        registers: { title: "รีจิสเตอร์ (Registers)", desc: "หน่วยความจำความเร็วสูงที่อยู่ภายใน CPU ใช้เก็บข้อมูลที่กำลังใช้งานอยู่", analogy: "เปรียบเหมือน: โต๊ะทำงานของเชฟที่วางวัตถุดิบที่ต้องใช้ทันที" },
+        ram: { title: "หน่วยความจำหลัก (RAM)", desc: "ที่เก็บข้อมูลและโปรแกรมหลักของคอมพิวเตอร์ CPU ต้องดึงข้อมูลจากที่นี่มาประมวลผล", analogy: "เปรียบเหมือน: ตู้เย็นหรือห้องเก็บวัตถุดิบขนาดใหญ่" },
+        cache: { title: "แคช (Cache)", desc: "หน่วยความจำความเร็วสูงที่คั่นกลางระหว่าง CPU กับ RAM ใช้เก็บข้อมูลที่ใช้บ่อยเพื่อลดเวลาในการเข้าถึง", analogy: "เปรียบเหมือน: ถาดวัตถุดิบที่ใช้บ่อยๆ วางไว้ข้างเตา" },
+    };
+    
+    const componentBoxes = document.querySelectorAll('.component-box');
+    const infoTitle = document.getElementById('info-title');
+    const infoDesc = document.getElementById('info-desc');
+    const infoAnalogy = document.getElementById('info-analogy');
+
+    componentBoxes.forEach(box => {
+        box.addEventListener('click', () => {
+            componentBoxes.forEach(b => b.classList.remove('active'));
+            box.classList.add('active');
+            
+            const componentId = box.dataset.id;
+            const data = components[componentId];
+            
+            infoTitle.textContent = data.title;
+            infoDesc.textContent = data.desc;
+            infoAnalogy.textContent = data.analogy;
+        });
+    });
+
+    // Section 2: CPU Cycle Simulation
+    const cycleState = {
+        step: 0,
+        initial: { pc: '0100', ir: '-', eax: '5' },
+        steps: [
+            { desc: '1. Fetch: CPU ใช้ค่าจาก PC (0100) เพื่อร้องขอคำสั่งจาก RAM' },
+            { desc: '1. Fetch: คำสั่ง "ADD EAX, 10" ถูกส่งจาก RAM มาเก็บไว้ใน Instruction Register (IR)', changes: { ir: 'ADD EAX, 10' } },
+            { desc: '1. Fetch: PC ถูกบวก 1 เพื่อเตรียมพร้อมสำหรับคำสั่งถัดไป', changes: { pc: '0101' } },
+            { desc: '2. Decode: หน่วยควบคุม (CU) ถอดรหัสคำสั่งใน IR เพื่อทำความเข้าใจว่าต้องทำการบวก' },
+            { desc: '3. Execute: CU สั่งให้ ALU นำค่าจากรีจิสเตอร์ EAX (5) และค่า 10 มาบวกกัน' },
+            { desc: '3. Execute: ผลลัพธ์ (15) ถูกส่งกลับไปเก็บในรีจิสเตอร์ EAX', changes: { eax: '15' } },
+            { desc: 'วัฏจักรเสร็จสิ้น! CPU พร้อมสำหรับคำสั่งถัดไปที่ตำแหน่ง 0101' }
+        ]
+    };
+
+    const cyclePC = document.getElementById('cycle-pc');
+    const cycleIR = document.getElementById('cycle-ir');
+    const cycleEAX = document.getElementById('cycle-eax');
+    const cycleCU = document.getElementById('cycle-cu');
+    const cycleALU = document.getElementById('cycle-alu');
+    const cycleRam = document.getElementById('cycle-ram-content');
+    const cycleExplanation = document.getElementById('cycle-explanation');
+    const nextBtn = document.getElementById('cycle-next-btn');
+    const resetBtn = document.getElementById('cycle-reset-btn');
+
+    function resetCycle() {
+        cycleState.step = 0;
+        cyclePC.textContent = cycleState.initial.pc;
+        cycleIR.textContent = cycleState.initial.ir;
+        cycleEAX.textContent = cycleState.initial.eax;
+        cycleExplanation.textContent = 'เริ่มต้น: โปรแกรมเคาน์เตอร์ (PC) ชี้ไปที่คำสั่งถัดไปใน RAM';
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'ขั้นตอนถัดไป';
+        [cyclePC, cycleIR, cycleEAX, cycleCU, cycleALU, cycleRam].forEach(el => el.classList.remove('highlight-anim', 'bg-teal-200'));
+    }
+
+    resetBtn.addEventListener('click', resetCycle);
+    
+    nextBtn.addEventListener('click', () => {
+        if (cycleState.step >= cycleState.steps.length) return;
+
+        const currentStepData = cycleState.steps[cycleState.step];
+        cycleExplanation.textContent = currentStepData.desc;
+        
+        [cyclePC, cycleIR, cycleEAX, cycleCU, cycleALU, cycleRam].forEach(el => el.classList.remove('highlight-anim', 'bg-teal-200'));
+
+        if (currentStepData.changes) {
+            if (currentStepData.changes.pc) cyclePC.textContent = currentStepData.changes.pc;
+            if (currentStepData.changes.ir) cycleIR.textContent = currentStepData.changes.ir;
+            if (currentStepData.changes.eax) cycleEAX.textContent = currentStepData.changes.eax;
+        }
+
+        // Visual highlights
+        if (cycleState.step === 0) { cyclePC.classList.add('highlight-anim'); cycleRam.classList.add('bg-teal-200');}
+        if (cycleState.step === 1) { cycleIR.classList.add('highlight-anim'); }
+        if (cycleState.step === 2) { cyclePC.classList.add('highlight-anim'); }
+        if (cycleState.step === 3) { cycleCU.classList.add('highlight-anim'); cycleIR.classList.add('bg-teal-200'); }
+        if (cycleState.step === 4) { cycleALU.classList.add('highlight-anim'); cycleEAX.classList.add('bg-teal-200'); }
+        if (cycleState.step === 5) { cycleEAX.classList.add('highlight-anim'); }
+
+        cycleState.step++;
+
+        if (cycleState.step >= cycleState.steps.length) {
+            nextBtn.disabled = true;
+            nextBtn.textContent = 'เสร็จสิ้น';
+        }
+    });
+
+    // Section 3: Register Tabs
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+            
+            tabBtns.forEach(b => {
+                b.classList.remove('border-teal-600', 'text-teal-600');
+                b.classList.add('border-transparent', 'text-stone-500');
+            });
+            btn.classList.add('border-teal-600', 'text-teal-600');
+            btn.classList.remove('border-transparent', 'text-stone-500');
+
+            tabContents.forEach(content => {
+                if (content.id === `${tabId}-content`) {
+                    content.classList.remove('hidden');
+                } else {
+                    content.classList.add('hidden');
+                }
+            });
+        });
+    });
+
+    // Section 4: Flags Simulation
+    const flagVal1 = document.getElementById('flag-val1');
+    const flagVal2 = document.getElementById('flag-val2');
+    const flagOp = document.getElementById('flag-op');
+    const flagExecBtn = document.getElementById('flag-exec-btn');
+    const flagResult = document.getElementById('flag-result');
+    const flagZf = document.getElementById('flag-zf');
+    const flagSf = document.getElementById('flag-sf');
+    const flagCf = document.getElementById('flag-cf');
+    const flagOf = document.getElementById('flag-of');
+    const flagPf = document.getElementById('flag-pf');
+    const flagExplanationEl = document.getElementById('flag-explanation');
+
+    function calculateFlags() {
+        const val1 = parseInt(flagVal1.value) || 0;
+        const val2 = parseInt(flagVal2.value) || 0;
+        const op = flagOp.value;
+        let result;
+
+        if (op === 'add') {
+            result = val1 + val2;
+        } else {
+            result = val1 - val2;
+        }
+
+        flagResult.textContent = result;
+        
+        let explanations = [];
+
+        // ZF
+        const isZf = result === 0;
+        flagZf.textContent = isZf ? '1' : '0';
+        flagZf.classList.toggle('set', isZf);
+        if(isZf) explanations.push("ZF=1 เพราะผลลัพธ์เป็น 0");
+
+        // SF (for simplicity, we assume 16-bit signed integers)
+        const isSf = result < 0;
+        flagSf.textContent = isSf ? '1' : '0';
+        flagSf.classList.toggle('set', isSf);
+        if(isSf) explanations.push("SF=1 เพราะผลลัพธ์เป็นค่าลบ");
+
+        // For CF and OF, we simplify for demonstration
+        let isCf = false, isOf = false;
+        if (op === 'add') {
+            isCf = result > 65535; // Unsigned overflow
+            isOf = (val1 > 0 && val2 > 0 && result < 0) || (val1 < 0 && val2 < 0 && result > 0); // Signed overflow
+        } else { // sub
+            isCf = val1 < val2; // Unsigned borrow
+            isOf = (val1 > 0 && val2 < 0 && result < 0) || (val1 < 0 && val2 > 0 && result > 0);
+        }
+        flagCf.textContent = isCf ? '1' : '0';
+        flagCf.classList.toggle('set', isCf);
+        if(isCf) explanations.push("CF=1 เกิดตัวทด/ยืมในการคำนวณแบบ Unsigned");
+        
+        flagOf.textContent = isOf ? '1' : '0';
+        flagOf.classList.toggle('set', isOf);
+        if(isOf) explanations.push("OF=1 ผลลัพธ์เกินขีดจำกัดของการคำนวณแบบ Signed");
+
+        // PF
+        const isPf = ((result & 0xff).toString(2).match(/1/g) || []).length % 2 === 0;
+        flagPf.textContent = isPf ? '1' : '0';
+        flagPf.classList.toggle('set', isPf);
+        if(isPf) explanations.push("PF=1 เพราะจำนวนบิต 1 ในผลลัพธ์ (8-bit LSB) เป็นเลขคู่");
+
+        flagExplanationEl.textContent = explanations.length > 0 ? explanations.join(' | ') : 'ไม่มีแฟล็กใดถูกตั้งค่า';
+    }
+
+    flagExecBtn.addEventListener('click', calculateFlags);
+    flagVal1.addEventListener('input', calculateFlags);
+    flagVal2.addEventListener('input', calculateFlags);
+    flagOp.addEventListener('change', calculateFlags);
+    
+    calculateFlags();
+
+    // Smooth scrolling for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Nav link active state on scroll
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    window.onscroll = () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 80) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active');
+            }
+        });
+    };
+
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microprocessor vs. Microcontroller vs. Embedded System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light gray-blue background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-purple-100">
+    <div class="max-w-6xl w-full bg-white rounded-3xl shadow-xl p-8 md:p-12 lg:p-16 text-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-800 mb-10 leading-tight">
+            Decoding Embedded Systems
+        </h1>
+        <p class="text-lg md:text-xl text-gray-600 mb-12">
+            Understanding the core components: Microprocessor, Microcontroller, and Embedded System.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
+            <!-- Microprocessor Card -->
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-8 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 flex flex-col items-center">
+                <div class="bg-white p-4 rounded-full shadow-md mb-6">
+                    <!-- Icon for Microprocessor (CPU Chip) -->
+                    <svg class="w-16 h-16 text-blue-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 3H19C20.1046 3 21 3.89543 21 5V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3ZM12 5C11.4477 5 11 5.44772 11 6V18C11 18.5523 11.4477 19 12 19C12.5523 19 13 18.5523 13 18V6C13 5.44772 12.5523 5 12 5ZM5 11C4.44772 11 4 11.4477 4 12V13C4 13.5523 4.44772 14 5 14C5.55228 14 6 13.5523 6 13V12C6 11.4477 5.55228 11 5 11ZM18 11C17.4477 11 17 11.4477 17 12V13C17 13.5523 17.4477 14 18 14C18.5523 14 19 13.5523 19 13V12C19 11.4477 18.5523 11 18 11Z"/>
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-bold text-white mb-4">Microprocessor</h3>
+                <p class="text-white text-lg leading-relaxed">
+                    The "brain" of a computer. It's a CPU that requires external memory, I/O, and other components to function. High processing power.
+                </p>
+            </div>
+
+            <!-- Microcontroller Card -->
+            <div class="bg-gradient-to-r from-emerald-500 to-green-600 p-8 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 flex flex-col items-center">
+                <div class="bg-white p-4 rounded-full shadow-md mb-6">
+                    <!-- Icon for Microcontroller (Integrated Chip) -->
+                    <svg class="w-16 h-16 text-green-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4ZM10 9H14V11H10V9ZM10 13H14V15H10V13Z"/>
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-bold text-white mb-4">Microcontroller</h3>
+                <p class="text-white text-lg leading-relaxed">
+                    A compact computer-on-a-chip. It integrates a CPU, memory, and I/O peripherals onto a single integrated circuit. Self-contained.
+                </p>
+            </div>
+
+            <!-- Embedded System Card -->
+            <div class="bg-gradient-to-r from-orange-500 to-red-600 p-8 rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-300 flex flex-col items-center">
+                <div class="bg-white p-4 rounded-full shadow-md mb-6">
+                    <!-- Icon for Embedded System (Smart Device) -->
+                    <svg class="w-16 h-16 text-red-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4ZM10 9H14V11H10V9ZM10 13H14V15H10V13Z"/>
+                    </svg>
+                    <!-- A simpler icon for an embedded system, e.g., a gear or a circuit board with a product outline -->
+                    <svg class="w-16 h-16 text-orange-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4ZM10 9H14V11H10V9ZM10 13H14V15H10V13Z"/>
+                        <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zM15 9H9v6h6V9z"/>
+                        <path d="M12 2c-5.523 0-10 4.477-10 10s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm-3-9h6v2h-6v-2zm0 4h6v2h-6v-2z"/>
+                    </svg>
+                    <!-- Using a more specific device icon -->
+                    <svg class="w-16 h-16 text-orange-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zM9 11v-2h6v2H9zm0 4v-2h6v2H9z"/>
+                        <path d="M17 5H7C5.89543 5 5 5.89543 5 7V17C5 18.1046 5.89543 19 7 19H17C18.1046 19 19 18.1046 19 17V7C19 5.89543 18.1046 5 17 5ZM7 7H17V17H7V7Z"/>
+                        <path d="M17 5H7c-1.104 0-2 .896-2 2v10c0 1.104.896 2 2 2h10c1.104 0 2-.896 2-2V7c0-1.104-.896-2-2-2zm0 2v10H7V7h10zM8 9h8v2H8V9zm0 4h8v2H8v-2z"/>
+                        <!-- A cleaner device icon: a smart watch or control panel -->
+                        <path d="M18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4ZM6 6H18V18H6V6Z"/>
+                        <rect x="7" y="7" width="10" height="10" rx="1" ry="1"/>
+                        <circle cx="12" cy="5" r="1"/>
+                        <circle cx="12" cy="19" r="1"/>
+                    </svg>
+                     <svg class="w-16 h-16 text-orange-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4ZM10 9H14V11H10V9ZM10 13H14V15H10V13Z"/>
+                        <!-- Smartwatch icon -->
+                        <path d="M17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V5C19 3.89543 18.1046 3 17 3ZM17 5V19H7V5H17ZM12 6C11.4477 6 11 6.44772 11 7V9C11 9.55228 11.4477 10 12 10C12.5523 10 13 9.55228 13 9V7C13 6.44772 12.5523 6 12 6ZM12 11C11.4477 11 11 11.4477 11 12V14C11 14.5523 11.4477 15 12 15C12.5523 15 13 14.5523 13 14V12C13 11.4477 12.5523 11 12 11Z"/>
+                    </svg>
+                    <!-- Final icon for Embedded System: a gear representing dedicated function -->
+                    <svg class="w-16 h-16 text-orange-600" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4ZM10 9H14V11H10V9ZM10 13H14V15H10V13Z"/>
+                        <path d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4ZM12 5.5C11.1716 5.5 10.5 6.17157 10.5 7V9C10.5 9.82843 11.1716 10.5 12 10.5C12.8284 10.5 13.5 9.82843 13.5 9V7C13.5 6.17157 12.8284 5.5 12 5.5ZM12 13.5C11.1716 13.5 10.5 14.1716 10.5 15V17C10.5 17.8284 11.1716 18.5 12 18.5C12.8284 18.5 13.5 17.8284 13.5 17V15C13.5 14.1716 12.8284 13.5 12 13.5Z" opacity="0"/>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-.96 16.04c-.38-.2-.73-.44-1.05-.7-.41-.33-.78-.71-1.1-1.1-.33-.42-.6-.89-.78-1.4-.18-.51-.27-1.07-.27-1.64 0-.57.09-1.13.27-1.64.18-.51.45-.98.78-1.4.33-.42.7-.79 1.1-1.1.32-.26.67-.5 1.05-.7.38-.2.79-.34 1.23-.42.44-.08.9-.12 1.37-.12.47 0 .93.04 1.37.12.44.08.85.22 1.23.42.38.2.73.44 1.05.7.41.33.78.71 1.1 1.1.33.42.6.89.78 1.4.18.51.27 1.07.27 1.64 0 .57-.09 1.13-.27 1.64-.18.51-.45.98-.78 1.4-.33.42-.7.79-1.1 1.1-.32.26-.67.5-1.05.7-.38.2-.79.34-1.23.42-.44.08-.9.12-1.37.12-.47 0-.93-.04-1.37-.12-.44-.08-.85-.22-1.23-.42zM12 16.5c2.485 0 4.5-2.015 4.5-4.5S14.485 7.5 12 7.5 7.5 9.515 7.5 12s2.015 4.5 4.5 4.5z"/>
+                    </svg>
+                </div>
+                <h3 class="text-3xl font-bold text-white mb-4">Embedded System</h3>
+                <p class="text-white text-lg leading-relaxed">
+                    A dedicated computer system designed to perform specific functions within a larger mechanical or electrical system. Uses microcontrollers or microprocessors.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
